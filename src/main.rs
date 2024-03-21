@@ -3,11 +3,7 @@ trait Food {
     fn name(&self) -> String;
 }
 
-trait Topping: Food {
-    fn topping_price(&self) -> usize;
-    fn topping_name(&self) -> String;
-    fn topping_fullname(&self) -> String;
-}
+trait Topping: Food {}
 
 struct Cookie;
 
@@ -45,19 +41,7 @@ impl<F: Food> Food for Chocolate<F> {
     }
 }
 
-impl<T: Topping> Topping for Chocolate<T> {
-    fn topping_price(&self) -> usize {
-        self.price()
-    }
-
-    fn topping_name(&self) -> String {
-        self.0.topping_name() + " and 🍫"
-    }
-
-    fn topping_fullname(&self) -> String {
-        self.0.name() + " with 🍫"
-    }
-}
+impl<T: Topping> Topping for Chocolate<T> {}
 
 struct Nuts<F: Food>(F);
 
@@ -71,19 +55,7 @@ impl<F: Food> Food for Nuts<F> {
     }
 }
 
-impl<T: Topping> Topping for Nuts<T> {
-    fn topping_price(&self) -> usize {
-        self.price()
-    }
-
-    fn topping_name(&self) -> String {
-        self.0.name() + " and 🥜"
-    }
-
-    fn topping_fullname(&self) -> String {
-        self.0.name() + " with 🥜"
-    }
-}
+impl<T: Topping> Topping for Nuts<T> {}
 
 // tests module
 #[cfg(test)]
