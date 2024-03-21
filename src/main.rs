@@ -3,8 +3,6 @@ trait Food {
     fn name(&self) -> String;
 }
 
-trait Cake: Food {}
-
 trait Topping: Food {
     fn topping_price(&self) -> usize;
     fn topping_name(&self) -> String;
