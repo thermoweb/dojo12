@@ -1,88 +1,91 @@
-use std::vec;
-
-trait Cake {
+trait Food {
     fn price(&self) -> usize;
-    fn name(&self) -> String {
-        self
-            .name_accumulator()
-            .into_iter()
-            .fold((0, String::new()), |(position, mut s), n| {
-                match position {
-                    0 => s.push_str(&n),
-                    1 => s.push_str(&format!(" with {n}")),
-                    _ => s.push_str(&format!(" and {n}")),
-                }
-                (position + 1, s)
-            })
-            .1
-    }
-    fn name_accumulator(&self) -> Vec<String> {
-        vec![self.name_constant().into()]
-    }
-    fn name_constant(&self) -> &'static str;
+    fn name(&self) -> String;
+}
+
+trait Cake: Food {}
+
+trait Topping: Food {
+    fn topping_price(&self) -> usize;
+    fn topping_name(&self) -> String;
+    fn topping_fullname(&self) -> String;
 }
 
 struct Cookie;
 
-impl Cake for Cookie {
+impl Food for Cookie {
     fn price(&self) -> usize {
         200
     }
 
-    fn name_constant(&self) -> &'static str {
-        "🍪"
+    fn name(&self) -> String {
+        "🍪".into()
     }
 }
 
 struct Cupcake;
 
-impl Cake for Cupcake {
+impl Food for Cupcake {
     fn price(&self) -> usize {
         100
     }
 
-    fn name_constant(&self) -> &'static str {
-        "🧁"
+    fn name(&self) -> String {
+        "🧁".into()
     }
 }
 
-struct Chocolate<C: Cake>(C);
+struct Chocolate<F: Food>(F);
 
-impl<C: Cake> Cake for Chocolate<C> {
+impl<F: Food> Food for Chocolate<F> {
     fn price(&self) -> usize {
-        &self.0.price() + 10
+        self.0.price() + 10
     }
 
-    fn name_constant(&self) -> &'static str {
-        "🍫"
-    }
-
-    fn name_accumulator(&self) -> Vec<String> {
-        let mut vec = self.0.name_accumulator();
-        vec.push(self.name_constant().into());
-        vec
+    fn name(&self) -> String {
+        self.0.name() + " with 🍫".into()
     }
 }
 
-struct Nuts<C: Cake>(C);
+impl<T: Topping> Topping for Chocolate<T> {
+    fn topping_price(&self) -> usize {
+        self.price()
+    }
 
-impl<C: Cake> Cake for Nuts<C> {
+    fn topping_name(&self) -> String {
+        self.0.topping_name() + " and 🍫"
+    }
+
+    fn topping_fullname(&self) -> String {
+        self.0.name() + " with 🍫"
+    }
+}
+
+struct Nuts<F: Food>(F);
+
+impl<F: Food> Food for Nuts<F> {
     fn price(&self) -> usize {
-        &self.0.price() + 20
+        self.0.price() + 20
     }
 
-    fn name_accumulator(&self) -> Vec<String> {
-        let mut vec = self.0.name_accumulator();
-        vec.push(self.name_constant().into());
-        vec
-    }
-
-    fn name_constant(&self) -> &'static str {
-        "🥜"
+    fn name(&self) -> String {
+        self.0.name() + " with 🥜".into()
     }
 }
 
-fn main() {}
+impl<T: Topping> Topping for Nuts<T> {
+    fn topping_price(&self) -> usize {
+        self.price()
+    }
+
+    fn topping_name(&self) -> String {
+        self.0.name() + " and 🥜"
+    }
+
+    fn topping_fullname(&self) -> String {
+        self.0.name() + " with 🥜"
+    }
+}
 
 // tests module
 #[cfg(test)]
