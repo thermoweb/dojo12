@@ -72,13 +72,33 @@ impl<F: Food> Food for Nuts<F> {
     }
 }
 
+struct Bundle {
+    food: Vec<Box<dyn Food>>,
+}
+
+struct MetaBundle {
+    bundles: Vec<Bundle>,
+}
+
+impl Bundle {
+    pub fn new() -> Bundle {
+        let vector = Vec::new();
+        Bundle { food: vector }
+    }
+
+    pub fn add_food(&mut self, food: Box<dyn Food>) {
+        self.food.push(food);
+    }
+}
+
 impl<T: Topping> Topping for Nuts<T> {}
 
 // tests module
 #[cfg(test)]
 mod tests {
-    use super::*;
     use pretty_assertions::assert_eq;
+
+    use super::*;
 
     #[test]
     fn test_cookie_price() {
@@ -129,5 +149,11 @@ mod tests {
         let sut = Nuts(Chocolate(Cookie));
         assert_eq!(sut.price(), 230);
         assert_eq!(sut.compose_name(), "🍪 with 🍫 and 🥜");
+    }
+
+    #[test]
+    fn test_bundle() {
+        let mut sut = Bundle::new();
+        sut.add_food(Box::new(Cookie));
     }
 }
